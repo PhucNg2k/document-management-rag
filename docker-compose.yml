@@ -23,6 +23,7 @@ services:
       - elasticsearch_storage:/usr/share/elasticsearch/data
     restart: always
 
+<<<<<<< HEAD
 volumes:
   qdrant_storage:
   elasticsearch_storage:
@@ -31,3 +32,22 @@ volumes:
       type: none
       device: D:/ElasticSearch_Data
       o: bind
+=======
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: document_store
+      MYSQL_USER: tiendoan
+      MYSQL_PASSWORD: tiendoan
+    ports:
+      - "3300:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+
+volumes:
+  qdrant_storage:
+  mysql_data:
+>>>>>>> 949eb90fc113c2f81610069fc66bbb434a346ecc

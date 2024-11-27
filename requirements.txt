@@ -13,6 +13,12 @@ libmagic
 openpyxl
 python-magic-bin==0.4.14
 flask
+<<<<<<< HEAD
 PyPDF2
 python-docx
 unstructured
+=======
+pymysql
+flask_sqlalchemy
+flask-migrate
+>>>>>>> 949eb90fc113c2f81610069fc66bbb434a346ecc
