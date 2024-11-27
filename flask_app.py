@@ -1,7 +1,7 @@
 import os
 import tempfile
 import shutil  
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, redirect, url_for
 from elasticsearch import Elasticsearch
 from datetime import datetime
 import PyPDF2
@@ -9,7 +9,7 @@ import docx
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from read_data.kotaemon.loaders import *
-from llama_index.readers.json import JSONReader
+from llama_index.core.readers.json import JSONReader
 from llama_index.readers.file import PandasCSVReader, UnstructuredReader
 
 text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
@@ -18,6 +18,7 @@ text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
 )
 
 def get_extractor(file_name: str):
+    
     map_reader = {
         "docx": DocxReader(),
         "html": UnstructuredReader(),
@@ -26,10 +27,10 @@ def get_extractor(file_name: str):
         "json": JSONReader(),
         "txt": TxtReader()
     }
-    return map_reader[file_name.split('.')[-1]]
+    return map_reader[ os.path.splitext(file_name)[1][1:]]
 
 app = Flask(__name__)
-es = Elasticsearch('https://localhost:9200', basic_auth=("elastic", "UOle-KXo9zL3zn8gW-aQ"), verify_certs=False)
+es = Elasticsearch('https://localhost:9200', basic_auth=("elastic", "J-E+YAAiYGPEVHboST=o"), verify_certs=False)
 
 def create_index(index_name='documents'):
     if not es.indices.exists(index=index_name):
@@ -43,6 +44,11 @@ def create_index(index_name='documents'):
                 }
             }
         })
+
+@app.route('/')
+def home_redirect():
+    return redirect(url_for('index'))
+
 @app.route('/home', methods=['GET'])
 def index():
     return render_template('index.html')
@@ -60,17 +66,21 @@ def upload_documents():
     
     try:
         for file in files:
+            
             temp_file_path = os.path.join(temp_dir, file.filename)
             file.save(temp_file_path)
-
             title = file.filename
+
             try:
                 print(f"Processing file: {file.filename}")
-                extractor = get_extractor(title)
+                extractor = get_extractor(file.filename)
+                print(f"Load extractor success")
                 document = extractor.load_data(temp_file_path)  
+                print(f"Load document success")
                 splits = text_splitter.split_text(document[0].text)
+                print(f"Split document success")
             except Exception as e:
-                return jsonify({"error": f"Unsupported file type: {title}"}), 400
+                return jsonify({"error": f"Unsupported file type: {e}"}), 400
 
             for split in splits:
                 body = {
@@ -113,3 +123,5 @@ def search_documents():
 if __name__ == '__main__':
     create_index()
     app.run(port=5000, debug=True)
+
+

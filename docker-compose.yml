@@ -19,5 +19,15 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
+    volumes:
+      - elasticsearch_storage:/usr/share/elasticsearch/data
     restart: always
 
+volumes:
+  qdrant_storage:
+  elasticsearch_storage:
+    driver: local
+    driver_opts:
+      type: none
+      device: D:/ElasticSearch_Data
+      o: bind

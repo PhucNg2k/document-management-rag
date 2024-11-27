@@ -1,4 +1,4 @@
-torch==2.1.0
+
 elasticsearch
 sentence_transformers
 langchain
@@ -13,3 +13,6 @@ libmagic
 openpyxl
 python-magic-bin==0.4.14
 flask
+PyPDF2
+python-docx
+unstructured
